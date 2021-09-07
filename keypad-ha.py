@@ -7,7 +7,7 @@ import websocket
 import json
 
 DEV_PATH = "/dev/input/event1"
-AUTH_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI3YjQyZWIyYjdjOTg0Y2RmYWJkMWE1MThlM2MxYzBmNCIsImlhdCI6MTYzMDgwMjc3OCwiZXhwIjoxOTQ2MTYyNzc4fQ.ZqJsZri60U7Btg0okJaSXds9x9S9hsZENTkLDRufe9E'
+AUTH_TOKEN = "<YOUR-TOKEN>"
 id_stamp = [0]
 BRIGHTNESS = [101]
 ALL_ON = [True]
@@ -26,6 +26,9 @@ def on_open(ws):
     print("socket established entering auth...")
     ws.send(json.dumps({'type': 'auth', 'access_token': AUTH_TOKEN}))
  
+ '''
+ Definition Generators
+ '''
 def init_socket_conn():
     try:
         websocket.enableTrace(False)
@@ -145,6 +148,9 @@ def hue_command_off_generator(id_stamp, name, action):
                 }
             })
 
+'''
+Controllers
+'''
 async def tv_change_source(future, source):
     ws.send(roku_change_source(id_stamp, source))
     future.set_result(True)
@@ -237,25 +243,25 @@ class DeviceListener:
                     TASK_LOOP.create_task(action.action(*args))
                     await args[0]
 
-KEY_MAPPINGS = {
-    'KPPLUS': DeviceAction(fan_ramp_up_all, [ALL_ON], lambda key, event: key == 'KPPLUS' and event.keystate == 1),
-    'KPMINUS': DeviceAction(fan_ramp_down_all, [ALL_ON], lambda key, event: key == 'KPMINUS' and event.keystate == 1),
-    'KPENTER': DeviceAction(fan_all_toggle, [ALL_ON], lambda key, event: key == 'KPENTER' and event.keystate== 1),
-    'KP0': DeviceAction(fan_change_color, [BRIGHTNESS, "red"], lambda key, event: key == 'KP0' and event.keystate== 1),
-    'KP6': DeviceAction(tv_navigate, ["right"], lambda key, event: key == 'KP6' and event.keystate == 1),
-    'KP4': DeviceAction(tv_navigate, ["left"], lambda key, event: key == 'KP4' and event.keystate == 1),
-    'KP8': DeviceAction(tv_navigate, ["up"], lambda key, event: key == 'KP8' and event.keystate == 1),
-    'KP2': DeviceAction(tv_navigate, ["down"], lambda key, event: key == 'KP2' and event.keystate == 1),
-    'KP5': DeviceAction(tv_navigate, ["select"], lambda key, event: key == 'KP5' and event.keystate == 1),
-    'KP9': DeviceAction(tv_navigate, ["back"], lambda key, event: key == 'KP9' and event.keystate == 1),
-    'KP1': DeviceAction(tv_navigate, ["play"], lambda key, event: key == 'KP1' and event.keystate == 1),
-    'KP3': DeviceAction(tv_navigate, ["volume_mute"], lambda key, event: key == 'KP3' and event.keystate == 1),
-    'KP7': DeviceAction(tv_change_source, ["Spotify Music"], lambda key, event: key == 'KP7' and event.keystate == 1),
-}
-
-
 def main():
+
     try:
+        KEY_MAPPINGS = {
+            'KPPLUS': DeviceAction(fan_ramp_up_all, [ALL_ON], lambda key, event: key == 'KPPLUS' and event.keystate == 1),
+            'KPMINUS': DeviceAction(fan_ramp_down_all, [ALL_ON], lambda key, event: key == 'KPMINUS' and event.keystate == 1),
+            'KPENTER': DeviceAction(fan_all_toggle, [ALL_ON], lambda key, event: key == 'KPENTER' and event.keystate== 1),
+            'KP0': DeviceAction(fan_change_color, [BRIGHTNESS, "red"], lambda key, event: key == 'KP0' and event.keystate== 1),
+            'KP6': DeviceAction(tv_navigate, ["right"], lambda key, event: key == 'KP6' and event.keystate == 1),
+            'KP4': DeviceAction(tv_navigate, ["left"], lambda key, event: key == 'KP4' and event.keystate == 1),
+            'KP8': DeviceAction(tv_navigate, ["up"], lambda key, event: key == 'KP8' and event.keystate == 1),
+            'KP2': DeviceAction(tv_navigate, ["down"], lambda key, event: key == 'KP2' and event.keystate == 1),
+            'KP5': DeviceAction(tv_navigate, ["select"], lambda key, event: key == 'KP5' and event.keystate == 1),
+            'KP9': DeviceAction(tv_navigate, ["back"], lambda key, event: key == 'KP9' and event.keystate == 1),
+            'KP1': DeviceAction(tv_navigate, ["play"], lambda key, event: key == 'KP1' and event.keystate == 1),
+            'KP3': DeviceAction(tv_navigate, ["volume_mute"], lambda key, event: key == 'KP3' and event.keystate == 1),
+            'KP7': DeviceAction(tv_change_source, ["Spotify Music"], lambda key, event: key == 'KP7' and event.keystate == 1),
+        }
+
         w = threading.Thread(target = init_socket_conn)
         w.daemon = True
         w.start()
