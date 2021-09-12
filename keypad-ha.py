@@ -244,34 +244,32 @@ class DeviceListener:
                     await args[0]
 
 def main():
-
+    KEY_MAPPINGS = {
+        'KPPLUS': DeviceAction(fan_ramp_up_all, [ALL_ON], lambda key, event: key == 'KPPLUS' and event.keystate == 1),
+        'KPMINUS': DeviceAction(fan_ramp_down_all, [ALL_ON], lambda key, event: key == 'KPMINUS' and event.keystate == 1),
+        'KPENTER': DeviceAction(fan_all_toggle, [ALL_ON], lambda key, event: key == 'KPENTER' and event.keystate== 1),
+        'KP0': DeviceAction(fan_change_color, [BRIGHTNESS, "red"], lambda key, event: key == 'KP0' and event.keystate== 1),
+        'KP6': DeviceAction(tv_navigate, ["right"], lambda key, event: key == 'KP6' and event.keystate == 1),
+        'KP4': DeviceAction(tv_navigate, ["left"], lambda key, event: key == 'KP4' and event.keystate == 1),
+        'KP8': DeviceAction(tv_navigate, ["up"], lambda key, event: key == 'KP8' and event.keystate == 1),
+        'KP2': DeviceAction(tv_navigate, ["down"], lambda key, event: key == 'KP2' and event.keystate == 1),
+        'KP5': DeviceAction(tv_navigate, ["select"], lambda key, event: key == 'KP5' and event.keystate == 1),
+        'KP9': DeviceAction(tv_navigate, ["back"], lambda key, event: key == 'KP9' and event.keystate == 1),
+        'KP1': DeviceAction(tv_navigate, ["play"], lambda key, event: key == 'KP1' and event.keystate == 1),
+        'KP3': DeviceAction(tv_navigate, ["volume_mute"], lambda key, event: key == 'KP3' and event.keystate == 1),
+        'KP7': DeviceAction(tv_change_source, ["Spotify Music"], lambda key, event: key == 'KP7' and event.keystate == 1),
+    }
+    
     try:
-        KEY_MAPPINGS = {
-            'KPPLUS': DeviceAction(fan_ramp_up_all, [ALL_ON], lambda key, event: key == 'KPPLUS' and event.keystate == 1),
-            'KPMINUS': DeviceAction(fan_ramp_down_all, [ALL_ON], lambda key, event: key == 'KPMINUS' and event.keystate == 1),
-            'KPENTER': DeviceAction(fan_all_toggle, [ALL_ON], lambda key, event: key == 'KPENTER' and event.keystate== 1),
-            'KP0': DeviceAction(fan_change_color, [BRIGHTNESS, "red"], lambda key, event: key == 'KP0' and event.keystate== 1),
-            'KP6': DeviceAction(tv_navigate, ["right"], lambda key, event: key == 'KP6' and event.keystate == 1),
-            'KP4': DeviceAction(tv_navigate, ["left"], lambda key, event: key == 'KP4' and event.keystate == 1),
-            'KP8': DeviceAction(tv_navigate, ["up"], lambda key, event: key == 'KP8' and event.keystate == 1),
-            'KP2': DeviceAction(tv_navigate, ["down"], lambda key, event: key == 'KP2' and event.keystate == 1),
-            'KP5': DeviceAction(tv_navigate, ["select"], lambda key, event: key == 'KP5' and event.keystate == 1),
-            'KP9': DeviceAction(tv_navigate, ["back"], lambda key, event: key == 'KP9' and event.keystate == 1),
-            'KP1': DeviceAction(tv_navigate, ["play"], lambda key, event: key == 'KP1' and event.keystate == 1),
-            'KP3': DeviceAction(tv_navigate, ["volume_mute"], lambda key, event: key == 'KP3' and event.keystate == 1),
-            'KP7': DeviceAction(tv_change_source, ["Spotify Music"], lambda key, event: key == 'KP7' and event.keystate == 1),
-        }
-
         w = threading.Thread(target = init_socket_conn)
         w.daemon = True
         w.start()
 
         TASK_LOOP = asyncio.get_event_loop()
-        asyncio.set_event_loop(TASK_LOOP)
 
         dev = DeviceListener(KEY_MAPPINGS, DEV_PATH)
         dev.load()
-        asyncio.ensure_future(dev.listen(TASK_LOOP))
+        TASK_LOOP.run_until_complete(dev.listen(TASK_LOOP))
         TASK_LOOP.run_forever()
     except:
         print("Press Control to ")
